@@ -1,0 +1,223 @@
+import type { Genre, MixRatios, Weather } from '../types';
+
+export interface StoryPreset {
+  id: string;
+  name: string;
+  genre: Genre;
+  description: string;
+  beats: string[];
+  tones: string[];
+  productionStyle: 'narration-first' | 'dialogue-first';
+  mix: MixRatios;
+  style: { artStyle: string; palette: string[]; lineWork: string; lighting: string; cameraLanguage: string };
+  musicMood: string;
+  weather: Weather[];
+  avgShotSec: number;
+}
+
+export const PRESETS: StoryPreset[] = [
+  {
+    id: 'anime-action',
+    name: 'Anime action',
+    genre: 'anime-action',
+    description: 'High-energy confrontations, speed lines, impact frames, rival dynamics.',
+    beats: ['Calm before the storm', 'The challenge appears', 'First clash goes badly', 'Hidden resolve', 'Decisive strike', 'Aftermath and promise'],
+    tones: ['tense', 'defiant', 'explosive', 'determined', 'triumphant'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.5, B: 0.4, C: 0.1 },
+    style: {
+      artStyle: '2D anime cel-shading, bold silhouettes, 2-tone shadows',
+      palette: ['#1d1b38', '#e8463c', '#f5c542', '#3fa9f5', '#f4efe6'],
+      lineWork: 'Clean dark outlines, thicker on silhouettes',
+      lighting: 'High contrast rim light, dramatic sunsets',
+      cameraLanguage: 'Low angles, fast push-ins, impact shakes, speed lines',
+    },
+    musicMood: 'driving',
+    weather: ['dust', 'embers'],
+    avgShotSec: 4,
+  },
+  {
+    id: 'comedy',
+    name: 'Animated comedy',
+    genre: 'comedy',
+    description: 'Setup–escalation–payoff structure with reaction shots and timing beats.',
+    beats: ['Normal day', 'A silly problem', 'Bad plan', 'Plan escalates', 'Everything collapses', 'Unexpected payoff'],
+    tones: ['playful', 'awkward', 'chaotic', 'deadpan', 'warm'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.7, B: 0.2, C: 0.1 },
+    style: {
+      artStyle: 'Flat 2D cartoon, rounded shapes, expressive faces',
+      palette: ['#2b2d42', '#ef8354', '#ffd166', '#06d6a0', '#f8f4ec'],
+      lineWork: 'Uniform medium outlines',
+      lighting: 'Bright, even, minimal shadows',
+      cameraLanguage: 'Static medium shots, snap zooms on reactions',
+    },
+    musicMood: 'bouncy',
+    weather: ['none'],
+    avgShotSec: 5,
+  },
+  {
+    id: 'horror',
+    name: 'Psychological horror',
+    genre: 'horror',
+    description: 'Slow dread, unreliable perception, long holds and sudden cuts.',
+    beats: ['Something is slightly wrong', 'Dismissed warning', 'Isolation', 'The reveal', 'Escape attempt', 'Lingering doubt'],
+    tones: ['uneasy', 'quiet', 'dread', 'panic', 'hollow'],
+    productionStyle: 'narration-first',
+    mix: { A: 0.55, B: 0.25, C: 0.2 },
+    style: {
+      artStyle: 'Desaturated 2D illustration, heavy shadow shapes',
+      palette: ['#0d0f14', '#2e3440', '#5e6b7a', '#8c1c13', '#d8d0c0'],
+      lineWork: 'Thin, slightly rough lines',
+      lighting: 'Single cold light sources, deep vignettes',
+      cameraLanguage: 'Slow push-ins, long static holds, sudden cuts',
+    },
+    musicMood: 'dark',
+    weather: ['dust', 'rain'],
+    avgShotSec: 6,
+  },
+  {
+    id: 'historical',
+    name: 'Historical storytelling',
+    genre: 'historical',
+    description: 'Narrated retelling of real events with illustrated tableaux.',
+    beats: ['The world as it was', 'A turning point', 'Key figures act', 'Consequences', 'Legacy'],
+    tones: ['reflective', 'grave', 'hopeful', 'solemn'],
+    productionStyle: 'narration-first',
+    mix: { A: 0.5, B: 0.2, C: 0.3 },
+    style: {
+      artStyle: 'Painterly 2D illustration with limited animation',
+      palette: ['#3d2c1e', '#a0522d', '#d4a76a', '#556b2f', '#efe6d2'],
+      lineWork: 'Soft brushed outlines',
+      lighting: 'Warm natural light',
+      cameraLanguage: 'Slow pans across tableaux, gentle zooms',
+    },
+    musicMood: 'stately',
+    weather: ['dust'],
+    avgShotSec: 6,
+  },
+  {
+    id: 'educational',
+    name: 'Educational explainer',
+    genre: 'educational',
+    description: 'Narration-led explanation with a friendly host character.',
+    beats: ['Hook question', 'Core concept', 'Example', 'Common mistake', 'Recap'],
+    tones: ['curious', 'clear', 'encouraging', 'upbeat'],
+    productionStyle: 'narration-first',
+    mix: { A: 0.75, B: 0.1, C: 0.15 },
+    style: {
+      artStyle: 'Clean flat 2D, simple shapes, high readability',
+      palette: ['#22223b', '#4a4e69', '#9a8c98', '#f2a541', '#f2e9e4'],
+      lineWork: 'Clean medium lines',
+      lighting: 'Flat, bright',
+      cameraLanguage: 'Static framing, gentle push-ins on key points',
+    },
+    musicMood: 'light',
+    weather: ['none', 'sparkles'],
+    avgShotSec: 6,
+  },
+  {
+    id: 'mystery',
+    name: 'Mystery / thriller',
+    genre: 'mystery',
+    description: 'Clues, suspicion, a turn, and a reveal.',
+    beats: ['The incident', 'First clue', 'Suspect', 'False lead', 'The real clue', 'Reveal'],
+    tones: ['curious', 'suspicious', 'tense', 'shocked', 'resolved'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.6, B: 0.25, C: 0.15 },
+    style: {
+      artStyle: '2D anime noir, strong shadow shapes',
+      palette: ['#14141f', '#2f3b52', '#c9a227', '#7a1f2b', '#e6e1d6'],
+      lineWork: 'Crisp outlines',
+      lighting: 'Lamp pools, neon accents',
+      cameraLanguage: 'Close-ups on details, slow pans',
+    },
+    musicMood: 'suspense',
+    weather: ['rain'],
+    avgShotSec: 5,
+  },
+  {
+    id: 'scifi',
+    name: 'Sci-fi adventure',
+    genre: 'scifi',
+    description: 'Wonder, technology, a mission and a twist.',
+    beats: ['Strange signal', 'Mission accepted', 'Into the unknown', 'Systems fail', 'Bold fix', 'New horizon'],
+    tones: ['wonder', 'urgent', 'technical', 'awed', 'hopeful'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.55, B: 0.35, C: 0.1 },
+    style: {
+      artStyle: '2D anime sci-fi, glowing accents',
+      palette: ['#0b1026', '#1f3c88', '#5ee7ff', '#ff5ea8', '#e9f1ff'],
+      lineWork: 'Clean lines, glow passes',
+      lighting: 'Cool ambient with neon rim lights',
+      cameraLanguage: 'Wide reveals, slow drifts',
+    },
+    musicMood: 'synth',
+    weather: ['sparkles'],
+    avgShotSec: 5,
+  },
+  {
+    id: 'adventure',
+    name: 'Adventure',
+    genre: 'adventure',
+    description: 'A journey with a goal, obstacles and a reward.',
+    beats: ['Ordinary world', 'Call to adventure', 'Obstacle', 'Midpoint discovery', 'Final push', 'Return changed'],
+    tones: ['eager', 'brave', 'worried', 'awed', 'joyful'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.6, B: 0.3, C: 0.1 },
+    style: {
+      artStyle: '2D cartoon-anime hybrid, warm saturated colours',
+      palette: ['#1f2a44', '#ff8c42', '#ffd23f', '#3bceac', '#fdf6e3'],
+      lineWork: 'Dark warm outlines',
+      lighting: 'Golden hour, soft rim light',
+      cameraLanguage: 'Wide establishing shots, tracking pans',
+    },
+    musicMood: 'adventurous',
+    weather: ['none', 'fireflies'],
+    avgShotSec: 5,
+  },
+  {
+    id: 'slice-of-life',
+    name: 'Slice of life',
+    genre: 'slice-of-life',
+    description: 'Small moments, gentle humour, quiet emotion.',
+    beats: ['Morning routine', 'Small disruption', 'Conversation', 'Realisation', 'Quiet resolution'],
+    tones: ['cozy', 'wistful', 'gentle', 'warm'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.7, B: 0.15, C: 0.15 },
+    style: {
+      artStyle: 'Soft 2D anime, pastel palette',
+      palette: ['#2d3047', '#f4a6a6', '#ffe5b4', '#a8d5ba', '#fffaf2'],
+      lineWork: 'Thin soft outlines',
+      lighting: 'Soft window light',
+      cameraLanguage: 'Gentle static shots, slow pans',
+    },
+    musicMood: 'cozy',
+    weather: ['none', 'sparkles'],
+    avgShotSec: 6,
+  },
+  {
+    id: 'custom',
+    name: 'Original custom genre',
+    genre: 'custom',
+    description: 'Neutral structure — define tone and style yourself.',
+    beats: ['Opening', 'Complication', 'Escalation', 'Climax', 'Resolution'],
+    tones: ['neutral'],
+    productionStyle: 'dialogue-first',
+    mix: { A: 0.6, B: 0.3, C: 0.1 },
+    style: {
+      artStyle: '2D cartoon/anime',
+      palette: ['#1e1e2e', '#f38ba8', '#f9e2af', '#89b4fa', '#f5f5f5'],
+      lineWork: 'Clean outlines',
+      lighting: 'Neutral',
+      cameraLanguage: 'Varied',
+    },
+    musicMood: 'neutral',
+    weather: ['none'],
+    avgShotSec: 5,
+  },
+];
+
+export function getPreset(id: string): StoryPreset {
+  return PRESETS.find((p) => p.id === id) ?? PRESETS[PRESETS.length - 1];
+}

@@ -1,0 +1,51 @@
+{
+  "name": "sceneforge-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SceneForge AI — local-first 2D animation production studio",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start:web": "next start -p 3000",
+    "worker": "tsx worker/index.ts",
+    "db:init": "tsx scripts/db-init.ts",
+    "db:generate": "drizzle-kit generate",
+    "demo:seed": "tsx scripts/seed-demo.ts",
+    "demo:render": "tsx scripts/render-demo.ts",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "typecheck": "tsc --noEmit",
+    "start": "scripts/start.sh",
+    "stop": "scripts/stop.sh",
+    "demo:preview": "tsx scripts/preview-scene.ts"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.540",
+    "@remotion/player": "^4.0.540",
+    "@remotion/renderer": "^4.0.540",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4",
+    "next": "^16.4.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.540",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
