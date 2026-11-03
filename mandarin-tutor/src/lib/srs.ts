@@ -95,7 +95,13 @@ export function previewIntervals(state: SrsState): Record<Rating, string> {
   return out;
 }
 
-/** A card counts as "learned" once it has graduated to a ≥ 1-day interval. */
-export function isLearned(state: Pick<SrsState, "intervalDays">): boolean {
-  return state.intervalDays >= 1;
+/**
+ * A word counts as "learned" once it has been recalled successfully twice in a
+ * row (SM-2 reps ≥ 2), or was easy enough to be pushed out ≥ 4 days at once.
+ */
+export function isLearned(state: Pick<SrsState, "intervalDays" | "reps">): boolean {
+  return state.reps >= 2 || state.intervalDays >= 4;
 }
+
+/** Prisma filter equivalent of isLearned(). */
+export const LEARNED_WHERE = { OR: [{ reps: { gte: 2 } }, { intervalDays: { gte: 4 } }] };

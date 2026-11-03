@@ -6,6 +6,7 @@ import { toneStats, weakestTone, topConfusion, type ToneStat } from "../toneStat
 import { newCardsIntroducedToday, unseenWords } from "./review";
 import { suggestSession } from "../plan";
 import type { Tone } from "../pinyin";
+import { LEARNED_WHERE } from "../srs";
 
 export const TONE_WINDOW = 500;
 
@@ -41,7 +42,7 @@ export async function getDashboard(user: User, now = new Date()) {
     prisma.card.count({ where: { userId: user.id, due: { lte: now } } }),
     prisma.card.count({ where: { userId: user.id, due: { lte: endOfToday } } }),
     prisma.card.count({ where: { userId: user.id } }),
-    prisma.card.count({ where: { userId: user.id, intervalDays: { gte: 1 } } }),
+    prisma.card.count({ where: { userId: user.id, ...LEARNED_WHERE } }),
     prisma.word.count(),
     newCardsIntroducedToday(user, now),
     unseenWords(user),

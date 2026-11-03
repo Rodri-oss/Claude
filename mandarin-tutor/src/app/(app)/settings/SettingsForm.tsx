@@ -24,9 +24,11 @@ export function SettingsForm({ initial, email }: { initial: Settings; email: str
   const [rate, setRateState] = useState(0.85);
 
   useEffect(() => {
-    void loadVoices().then((v) => setVoices(chineseVoices(v)));
+    void loadVoices().then((v) => {
+      setVoices(chineseVoices(v));
+      setRateState(getRate());
+    });
     void pickVoice().then(({ voice }) => setVoiceURI(voice?.voiceURI ?? ""));
-    setRateState(getRate());
   }, []);
 
   async function save(patch: Partial<Settings>) {

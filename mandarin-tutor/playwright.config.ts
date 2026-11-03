@@ -1,10 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import os from "node:os";
+import path from "node:path";
 
 const PORT = 3200;
 const DB = "file:./e2e.db";
 
 export default defineConfig({
   testDir: "tests/e2e",
+  // Keep artifacts outside the project: files written inside it make `next dev` hot-reload mid-test.
+  outputDir: path.join(os.tmpdir(), "mandarin-tutor-e2e"),
   fullyParallel: false,
   workers: 1,
   timeout: 60_000,

@@ -6,11 +6,10 @@ import { pickVoice, speechSupported, type VoiceKind } from "@/lib/audio/speech";
 export function VoiceStatus({ compact = false }: { compact?: boolean }) {
   const [state, setState] = useState<{ kind: VoiceKind; name?: string } | null>(null);
   useEffect(() => {
-    if (!speechSupported()) {
-      setState({ kind: "none" });
-      return;
-    }
-    void pickVoice().then(({ voice, kind }) => setState({ kind, name: voice?.name }));
+    const result: Promise<{ kind: VoiceKind; name?: string }> = speechSupported()
+      ? pickVoice().then(({ voice, kind }) => ({ kind, name: voice?.name }))
+      : Promise.resolve({ kind: "none" });
+    void result.then(setState);
   }, []);
   if (!state) return null;
   if (state.kind === "zh-TW") {

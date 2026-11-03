@@ -92,3 +92,21 @@ select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* Chart roles (validated categorical palette: first three slots) */
+:root {
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --grid: #2c2c2a;
+    --axis: #383835;
+  }
+}

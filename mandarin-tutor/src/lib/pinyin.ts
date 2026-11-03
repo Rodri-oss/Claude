@@ -247,7 +247,7 @@ export const TONE_SHORT: Record<Tone, string> = {
   2: "2nd",
   3: "3rd",
   4: "4th",
-  5: "Neutral",
+  5: "neutral",
 };
 
 /** Chao tone letters used for the synthesized pitch contour. */
