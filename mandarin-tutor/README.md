@@ -11,6 +11,9 @@ at Novice.
   graph, accuracy per tone, and re-drills of your weakest tone.
 - **Progress dashboard**: streak, words learned, cards due, tone accuracy, a 30-day activity chart and a
   suggested 20-minute daily session.
+- **Demand test** (Phase 2): magic-link accounts, a landing page with a waitlist, a "Go Pro" pricing page
+  with a fake door (Free / $5 / $10, **nobody is charged**), an in-app survey after the 5th study session, and an
+  admin page for you only.
 
 Stack: Next.js 16 (App Router) + TypeScript, Prisma + SQLite, Tailwind CSS v4, Web Speech API (zh-TW
 voice) and Web Audio API.
@@ -29,6 +32,10 @@ npx prisma migrate deploy     # creates prisma/dev.db
 npx prisma db seed            # loads the 300 words
 npm run dev                   # http://localhost:3000
 ```
+
+Open http://localhost:3000, click **Start free** and enter your `ADMIN_EMAIL`. Without an email provider
+configured, the sign-in link is printed in the terminal and also shown on the login page, which only
+happens in development. Click it, then **Sign in**. Your Phase 1 progress belongs to that email, so it carries over.
 
 Open it on your phone: run `npm run dev -- -H 0.0.0.0`, then visit `http://<your-computer-ip>:3000` on the
 same Wi-Fi. Microphone recording needs HTTPS or `localhost`, so test shadowing on the computer, or
@@ -58,7 +65,7 @@ exercises by ear this way. The 〰️ *Contour* buttons play these shapes on dem
 | `npm run dev` | Development server |
 | `npm run build && npm start` | Production build / server |
 | `npm test` | Unit tests (Vitest): pinyin/Zhuyin, SM-2, dates/streaks, tone stats, session plan, pitch detection, **dataset validation** |
-| `npm run test:e2e` | End-to-end tests (Playwright, mobile viewport, fake microphone) against a fresh `prisma/e2e.db` |
+| `npm run test:e2e` | End-to-end tests (Playwright, mobile viewport, fake microphone) against a production build and a fresh `prisma/e2e.db` |
 | `npm run db:seed` | Re-run the seed (idempotent: updates words in place, keeps progress) |
 | `npx tsx scripts/demo-data.ts` | Fill a **demo** database with 30 days of fake history (refuses to run unless `DATABASE_URL` contains "demo") |
 
@@ -128,8 +135,80 @@ activity.
 `ShadowAttempt` · `ActivityDay` (per-day counters in the learner's time zone) · `StudySession` (a run of
 activity with no gap over 30 minutes).
 
-In Phase 1 there is no login. All progress belongs to the user whose email is `ADMIN_EMAIL`. When
-accounts are added, signing in with that email keeps everything.
+Phase 2 adds `AuthSession`, `LoginToken`, `WaitlistEntry`, `PricingClick` and `SurveyResponse`.
+
+---
+
+## Phase 2: demand test
+
+### Accounts (magic links)
+
+`/login` takes an email address and sends a one-time link (15 minutes, single use; only a SHA-256 hash is stored).
+The link opens `/login/verify`, where a **Sign in** button POSTs the token. Link-preview bots in email
+clients can't use up the token by fetching the URL. Sessions are httpOnly cookies that last 30 days. Each
+email gets at most 5 links per hour. All study data is per user.
+
+Email delivery: set `RESEND_API_KEY` (simplest: verify a domain at resend.com) **or** `SMTP_URL`, plus
+`EMAIL_FROM` and `APP_URL`. With neither, links are printed to the server log.
+
+### Landing page (`/`) and pricing (`/pricing`)
+
+The landing page covers what the app does, who it's for, why it's built for Taiwan, screenshots and a waitlist
+form. Screenshots in `public/screenshots/` are real captures from a demo account. Regenerate them with
+`scripts/screenshots.mjs`; the steps are in the file header.
+
+**Go Pro** shows Free ($0), Pro ($5/mo) and Pro+ ($10/mo). Every tier click is recorded with an anonymous
+visitor cookie, plus the user ID if the visitor is signed in. Free sends people into the app. Pro and Pro+ open
+*"Pro is coming soon. Want early access?"*, which says nobody has been charged and collects an email
+(stored on the waitlist with the tier). No payment code exists. The tier feature lists are in
+`src/data/pricing.ts`. Edit them to test different offers.
+
+### Survey
+
+A study session is a run of activity with no gap over 30 minutes. Once a learner has had **5 sessions**,
+a 4-question sheet appears on the next non-exercise page: level, why they're learning, most useful
+feature, and monthly willingness to pay. A comment is optional. **Not now** hides it until their next session, at
+most 3 times. Questions are in `src/data/survey.ts`.
+
+### Admin (`/admin`)
+
+Only visible when signed in as `ADMIN_EMAIL`. Everyone else gets a 404, on the page and its CSV
+exports. Your own account is excluded from the numbers by default; a link toggles it back in. The page shows:
+
+- **Signups**: accounts total, new in the last 7 days, signups per day (30 days), waitlist count and source
+- **Daily active users**: learners with study activity that day (30-day chart, today, 7-day average)
+- **7-day retention**: share of learners who signed up at least 7 days ago and studied on day 7 (day 0 =
+  signup day in their time zone). Also D1, "came back within 7 days", and weekly signup cohorts
+- **Pricing-tier clicks** by tier: clicks, unique visitors, early-access emails, visitor → email rate
+- **Survey answers**: distribution for each question plus every response with comments
+- CSV export of users, waitlist and survey responses
+
+### Deploying (Fly.io; Railway or a VPS work the same way)
+
+SQLite needs a persistent disk and a **single** app instance. The `Dockerfile` runs migrations and the
+idempotent seed on every start.
+
+```bash
+fly launch --no-deploy --copy-config        # choose an app name; edit fly.toml's app = "..."
+fly volumes create tutor_data --size 1 --region nrt
+fly secrets set ADMIN_EMAIL=you@example.com APP_URL=https://<app>.fly.dev \
+  RESEND_API_KEY=re_... EMAIL_FROM="Taiwan Tutor <login@yourdomain.com>"
+fly deploy
+```
+
+**Railway**: deploy from the repo (root directory `mandarin-tutor`, Dockerfile detected), add a volume
+mounted at `/data`, and set the same variables. **VPS**: `docker build -t tutor . && docker run -d -p 3000:3000
+-v tutor-data:/data --env-file .env.production tutor` behind Caddy or nginx for HTTPS.
+Microphone recording (shadowing) needs HTTPS.
+
+Back up the database by copying `/data/app.db`, e.g. `fly ssh sftp get /data/app.db`.
+
+### Testing the demand test
+
+- `npm test`: 77 unit tests, including the retention and DAU calculations
+- `npm run test:e2e`: 14 Playwright tests against a production build. They cover sign-in, per-user progress,
+  single-use links, the landing waitlist, the pricing fake door and click counts, the survey after 5
+  sessions with *Not now*, and the admin page (access control, retention, clicks, survey, CSV)
 
 ---
 
@@ -142,8 +221,10 @@ src/data/          vocabulary (core + themed sets), tone drill items, minimal pa
 src/lib/           pinyin/Zhuyin, SM-2, dates, tone stats, session plan
 src/lib/audio/     speech synthesis, tone-contour synth, recorder, pitch tracking
 src/lib/server/    Prisma client, current user, review queue, stats, activity tracking
-src/app/(app)/     dashboard, review, tones (identify / pairs / shadowing), vocab, settings
-src/app/api/       JSON endpoints used by the client components
+src/app/(app)/     dashboard, review, tones (identify / pairs / shadowing), vocab, settings (sign-in required)
+src/app/           landing (/), pricing, login, admin
+src/app/api/       JSON endpoints (auth, review, tones, shadowing, waitlist, pricing clicks, survey, admin export)
+src/lib/metrics.ts DAU / retention / cohort calculations
 tests/unit/        Vitest
 tests/e2e/         Playwright
 ```

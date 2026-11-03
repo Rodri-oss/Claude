@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { LEARNER, login } from "./helpers";
 
-test("dashboard: streak, words, due, tone accuracy, 30-day chart, 20-minute plan", async ({ page, request }) => {
+test.beforeEach(async ({ page }) => login(page, LEARNER));
+
+test("dashboard: streak, words, due, tone accuracy, 30-day chart, 20-minute plan", async ({ page }) => {
+  const request = page.request;
   // some activity today
   await request.post("/api/review/answer", { data: { wordId: 1, rating: 4 } }); // Easy → 4 days → learned
   await request.post("/api/review/answer", { data: { wordId: 2, rating: 3 } });

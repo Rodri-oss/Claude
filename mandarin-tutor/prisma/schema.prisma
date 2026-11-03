@@ -8,17 +8,21 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  createdAt  DateTime @default(now())
-  timezone   String   @default("Asia/Taipei")
-  showPinyin Boolean  @default(true)
-  showZhuyin Boolean  @default(true)
-  newPerDay  Int      @default(10)
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  createdAt          DateTime  @default(now())
+  timezone           String    @default("Asia/Taipei")
+  showPinyin         Boolean   @default(true)
+  showZhuyin         Boolean   @default(true)
+  newPerDay          Int       @default(10)
   /// TOCFL level the learner is focusing on (N1, N2, A1, ...)
-  level      String   @default("N1")
+  level              String    @default("N1")
   /// optional deck filter for new cards: core, campus, food, mrt, tech, or "all"
-  deck       String   @default("all")
+  deck               String    @default("all")
+  lastSeenAt         DateTime?
+  /// survey shown after the 5th study session
+  surveyPromptedAt   DateTime?
+  surveyDismissCount Int       @default(0)
 
   cards          Card[]
   reviews        ReviewLog[]
@@ -26,6 +30,8 @@ model User {
   shadowAttempts ShadowAttempt[]
   activityDays   ActivityDay[]
   sessions       StudySession[]
+  authSessions   AuthSession[]
+  survey         SurveyResponse?
 }
 
 model Word {
@@ -141,4 +147,72 @@ model StudySession {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, startedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2: accounts and demand test
+// ---------------------------------------------------------------------------
+
+/// Signed-in browser session. Only a SHA-256 hash of the cookie token is stored.
+model AuthSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// One-time magic-link token (hash only), valid for 15 minutes.
+model LoginToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  email     String
+  next      String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  @@index([email, createdAt])
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  /// "landing" | "pricing"
+  source    String
+  /// pricing tier they asked early access for, if any
+  tier      String?
+  visitorId String?
+  userId    String?
+  createdAt DateTime @default(now())
+}
+
+/// A click on a pricing tier ("free" | "plus" | "pro"). Nobody is charged.
+model PricingClick {
+  id        String   @id @default(cuid())
+  tier      String
+  visitorId String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([tier])
+}
+
+model SurveyResponse {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  level       String
+  reason      String
+  reasonOther String?
+  mostUseful  String
+  /// monthly willingness to pay bucket, e.g. "0", "1-4", "5-9", "10-14", "15+"
+  wtp         String
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

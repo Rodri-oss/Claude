@@ -162,7 +162,20 @@ export function SettingsForm({ initial, email }: { initial: Settings; email: str
         </details>
       </section>
 
-      <p className="text-center text-xs text-muted">Signed in as {email}</p>
+      <div className="space-y-2 text-center">
+        <p className="text-xs text-muted">Signed in as {email}</p>
+        <button
+          className="rounded-xl border border-line px-4 py-2 text-sm"
+          onClick={async () => {
+            await fetch("/api/auth/logout", { method: "POST" });
+            // full reload on purpose: drop all client state of the signed-out user
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+            window.location.assign("/");
+          }}
+        >
+          Sign out
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { LEARNER, login } from "./helpers";
+
+test.beforeEach(async ({ page }) => login(page, LEARNER));
 
 test.describe.configure({ mode: "serial" });
 

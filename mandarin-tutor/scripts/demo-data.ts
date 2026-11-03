@@ -78,6 +78,8 @@ async function main() {
     await prisma.studySession.create({ data: { userId: user.id, startedAt: new Date(base), lastActiveAt: new Date(t) } });
     await prisma.activityDay.create({ data: { userId: user.id, date, reviews, newCards, toneDrills, shadowing, activeSeconds: Math.round((t - base) / 1000) } });
   }
+  // already answered the survey, so it doesn't pop up in screenshots
+  await prisma.surveyResponse.create({ data: { userId: user.id, level: "novice", reason: "study", mostUseful: "toneId", wtp: "5-9" } });
   console.log(`Demo history created for ${email}: ${cards.size} cards.`);
 }
 

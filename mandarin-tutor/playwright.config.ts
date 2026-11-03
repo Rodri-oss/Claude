@@ -23,10 +23,10 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: `node tests/e2e/reset-db.mjs && next dev -p ${PORT}`,
+    command: `node tests/e2e/reset-db.mjs && next build && next start -p ${PORT}`,
     url: `http://localhost:${PORT}/api/health`,
     reuseExistingServer: false,
-    timeout: 120_000,
-    env: { DATABASE_URL: DB, ADMIN_EMAIL: "learner@example.com", E2E: "1" },
+    timeout: 300_000,
+    env: { DATABASE_URL: DB, ADMIN_EMAIL: "learner@example.com", LOGIN_RATE_LIMIT_PER_HOUR: "1000", E2E_EXPOSE_LOGIN_LINKS: "1", INSECURE_COOKIES: "1" },
   },
 });

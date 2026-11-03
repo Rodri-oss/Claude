@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { LEARNER, login } from "./helpers";
+
+test.beforeEach(async ({ page }) => login(page, LEARNER));
 
 test.describe.configure({ mode: "serial" });
 
@@ -23,7 +26,8 @@ test("minimal pairs: answer and compare", async ({ page }) => {
   await expect(page.getByTestId("feedback")).toHaveCount(0);
 });
 
-test("weakest tone is detected and re-drilled", async ({ page, request }) => {
+test("weakest tone is detected and re-drilled", async ({ page }) => {
+  const request = page.request;
   // 10 correct answers for tones 1, 2, 4, 5 and mostly-wrong 3rd tones
   const post = (expectedTone: number, answeredTone: number) =>
     request.post("/api/tones/attempt", { data: { exercise: "tone-id", prompt: "test", expectedTone, answeredTone } });
