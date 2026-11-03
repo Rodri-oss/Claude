@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  createdAt  DateTime @default(now())
+  timezone   String   @default("Asia/Taipei")
+  showPinyin Boolean  @default(true)
+  showZhuyin Boolean  @default(true)
+  newPerDay  Int      @default(10)
+  /// TOCFL level the learner is focusing on (N1, N2, A1, ...)
+  level      String   @default("N1")
+  /// optional deck filter for new cards: core, campus, food, mrt, tech, or "all"
+  deck       String   @default("all")
+
+  cards          Card[]
+  reviews        ReviewLog[]
+  toneAttempts   ToneAttempt[]
+  shadowAttempts ShadowAttempt[]
+  activityDays   ActivityDay[]
+  sessions       StudySession[]
+}
+
+model Word {
+  id          Int    @id @default(autoincrement())
+  hanzi       String @unique
+  pinyinNum   String
+  pinyin      String
+  zhuyin      String
+  english     String
+  level       String
+  category    String
+  rank        Int
+  exZh        String
+  exPinyinNum String
+  exPinyin    String
+  exZhuyin    String
+  exEn        String
+
+  cards Card[]
+
+  @@index([level, rank])
+}
+
+/// One row per (user, word) once the word has been introduced.
+model Card {
+  id             String    @id @default(cuid())
+  userId         String
+  wordId         Int
+  ease           Float     @default(2.5)
+  intervalDays   Int       @default(0)
+  reps           Int       @default(0)
+  lapses         Int       @default(0)
+  due            DateTime
+  introducedAt   DateTime  @default(now())
+  lastReviewedAt DateTime?
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word    Word        @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  reviews ReviewLog[]
+
+  @@unique([userId, wordId])
+  @@index([userId, due])
+}
+
+model ReviewLog {
+  id             String   @id @default(cuid())
+  userId         String
+  cardId         String
+  rating         Int
+  wasNew         Boolean
+  intervalBefore Int
+  intervalAfter  Int
+  easeAfter      Float
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Tone identification and minimal-pair answers.
+model ToneAttempt {
+  id           String   @id @default(cuid())
+  userId       String
+  exercise     String // "tone-id" | "minimal-pair"
+  prompt       String // item id / pinyin that was played
+  expectedTone Int
+  answeredTone Int
+  correct      Boolean
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model ShadowAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  wordId    Int
+  rating    Int // 1–4 self-rating
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Per-day activity counters in the learner's own time zone.
+model ActivityDay {
+  id            String @id @default(cuid())
+  userId        String
+  date          String // YYYY-MM-DD
+  reviews       Int    @default(0)
+  newCards      Int    @default(0)
+  toneDrills    Int    @default(0)
+  shadowing     Int    @default(0)
+  activeSeconds Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+/// A study session = a run of activity with no gap longer than 30 minutes.
+model StudySession {
+  id           String   @id @default(cuid())
+  userId       String
+  startedAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+}

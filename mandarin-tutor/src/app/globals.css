@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: #faf8f4;
+  --card: #ffffff;
+  --ink: #1d1b18;
+  --ink-2: #57534c;
+  --muted: #8b867c;
+  --line: #e6e1d7;
+  --accent: #c8372d; /* vermilion */
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe9e6;
+  --jade: #1f7a5c;
+  --jade-soft: #e3f3ec;
+  --warn-soft: #fff4dc;
+  --t1: #d9363e;
+  --t2: #d97a00;
+  --t3: #2b8a3e;
+  --t4: #1971c2;
+  --t5: #7a7a80;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #151412;
+    --card: #1f1d1a;
+    --ink: #f1eee8;
+    --ink-2: #c4bfb4;
+    --muted: #8f8a80;
+    --line: #34312c;
+    --accent: #e0564b;
+    --accent-ink: #ffffff;
+    --accent-soft: #3a1f1c;
+    --jade: #4cc293;
+    --jade-soft: #173328;
+    --warn-soft: #3a3020;
+    --t1: #ff6b6b;
+    --t2: #ffa94d;
+    --t3: #69db7c;
+    --t4: #4dabf7;
+    --t5: #a6a6ad;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-jade: var(--jade);
+  --color-jade-soft: var(--jade-soft);
+  --color-warn-soft: var(--warn-soft);
+  --color-t1: var(--t1);
+  --color-t2: var(--t2);
+  --color-t3: var(--t3);
+  --color-t4: var(--t4);
+  --color-t5: var(--t5);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-han: "PingFang TC", "Noto Sans TC", "Noto Sans CJK TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.han {
+  font-family: var(--font-han);
+}
+
+.zhuyin {
+  font-family: var(--font-han);
+  letter-spacing: 0.02em;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
